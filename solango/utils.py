@@ -78,8 +78,7 @@ def get_facets_links(request, results):
     (links, link) = ([], {})
     
     for facet in results.facets:
-        
-        links.append(facet.name.title())
+        #links.append(facet.name.title())
         
         base = get_base_url(request, ["page", facet.name])
         
@@ -92,19 +91,21 @@ def get_facets_links(request, results):
         val = get_param(request, facet.name, None)
         
         for value in facet.values:
+            
             clean = value.value
-            if clean.find(" ") is not -1:
-                clean = '"%s"' % clean
+            if clean != '':
+                if clean.find(" ") is not -1:
+                    clean = '"%s"' % clean
             
-            link = {
-                "anchor": value.name, "count": value.count, "level": value.level,
-                "href": base + facet.name + "=" + clean + ""
-            }
+                link = {
+                    "anchor": value.name, "count": value.count, "level": value.level,
+                    "href": base + facet.name + "=" + clean + ""
+                }
             
-            if val == clean:
-                link["active"] = True
+                if val == clean:
+                    link["active"] = True
             
-            links.append(link)
+                links.append(link)
     
     return links
 
