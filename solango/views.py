@@ -47,6 +47,7 @@ class SearchView(object):
         params = {}
         facets = []
         sort_links = []
+        facet_dates = []
         
         paginator = None
         if request.GET:
@@ -58,6 +59,7 @@ class SearchView(object):
                 params.update(form.cleaned_data)
                 paginator = SearchPaginator(params, request)
                 facets = utils.get_facets_links(request, paginator.results)
+                facet_dates = utils.get_facet_date_links( request, paginator.results)
                 sort_links = utils.get_sort_links(request)
         else:
             form = form_class()
@@ -107,7 +109,8 @@ class SearchView(object):
         return RequestContext(request, {'paginator': paginator,
                                         'facets' : facets,
                                         'form' : form,
-                                        'sort_links' : sort_links}) 
+                                        'sort_links' : sort_links,
+                                        'facet_dates': facet_dates }) 
     
 # View.
 select = SearchView()

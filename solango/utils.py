@@ -1,7 +1,7 @@
 #
 # Copyright 2008 Optaros, Inc.
 #
-import urllib
+import urllib, datetime
 from solango import settings
 
 def get_base_url(request, exclude=[]):
@@ -106,6 +106,60 @@ def get_facets_links(request, results):
                     link["active"] = True
             
                 links.append(link)
+    
+    return links
+
+def get_facet_date_links(request, results):
+    """
+    Returns a list of facet date links, allowing users to quickly drill into their
+    search results by fields which support faceting.
+    """
+    (links, link) = ([], {})
+    
+    params = results.header.get('params', None)
+    if params is not None:
+        date_gap = params.get('facet.date.gap', None)
+        
+        if date_gap is not None:
+            for facet in results.facet_dates:
+                
+                links.append(facet.name.title())
+                
+                base = get_base_url(request, ["page", facet.name])
+                
+                link = {
+                    "anchor": "All", "count": None, "level": "0", "href": base
+                }
+                
+                links.append(link)
+                
+                val = get_param(request, facet.name, None)
+                #import ipdb; ipdb.set_trace()    
+                for value in facet.values:
+                    clean = value.value
+                    #if clean.find(" ") is not -1:
+                    clean = urllib.quote('[%s TO %s%s]' % (clean, clean, date_gap))
+                    
+                    date_obj = datetime.datetime.strptime(value.name, "%Y-%m-%dT%H:%M:%SZ")
+                    date_format = "%B %d %Y"
+                    if 'YEAR' in date_gap:
+                        date_format = "%Y"
+                    elif 'MONTH' in date_gap:
+                        date_format = "%B %Y"
+                        
+                    date_str = datetime.datetime.strftime(date_obj, date_format)
+                    
+                        
+                    link = {
+                        "anchor": date_str, 
+                        "count": value.count, "level": value.level,
+                        "href": base + facet.name + "=" + clean + ""
+                    }
+                    if val is not None:
+                        if urllib.quote(val) == clean:
+                            link["active"] = True
+                    
+                    links.append(link)
     
     return links
 
