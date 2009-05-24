@@ -140,7 +140,11 @@ def get_facet_date_links(request, results):
                     #if clean.find(" ") is not -1:
                     clean = urllib.quote('[%s TO %s%s]' % (clean, clean, date_gap))
                     
-                    date_obj = datetime.datetime.strptime(value.name, "%Y-%m-%dT%H:%M:%SZ")
+                    date_value = value.name
+                    millisecond_start = date_value.rfind('.')
+                    if millisecond_start > -1:
+                        date_value = date_value[:millisecond_start] + 'Z'
+                    date_obj = datetime.datetime.strptime(date_value, "%Y-%m-%dT%H:%M:%SZ")
                     date_format = "%B %d %Y"
                     if 'YEAR' in date_gap:
                         date_format = "%Y"
