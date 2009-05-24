@@ -10,6 +10,9 @@ from solango import settings
 from solango import registry
 import urllib
 
+class SolrException(Exception):
+    pass
+
 class Results:
     """
     Results instances parse Solr response XML into Python objects.  A Solr
@@ -173,13 +176,19 @@ class SelectResults(Results):
         result = self._get_result_node()
         facets =  xmlutils.get_sibling_node(result, "lst", "facet_counts")
         
+        
         if not facets:
             return None
         
         fields = xmlutils.get_child_node(facets, "lst", "facet_fields")
-
+        
         if not fields:
             return None
+                    
+        exceptions = xmlutils.get_child_node(facets, 'str')
+        
+        if exceptions:
+            raise SolrException('There was a java exception:  %s' % exceptions.lastChild.wholeText)
 
         for facet in xmlutils.get_child_nodes(fields, "lst"):
             self.facets.append(Facet(facet))
