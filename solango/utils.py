@@ -90,16 +90,27 @@ def get_facets_links(request, results):
         
         val = get_param(request, facet.name, None)
         
+        previous_level = 0
         for value in facet.values:
-            
+            indent = False
+            undent = False
             clean = value.value
             if clean != '':
                 if clean.find(" ") is not -1:
                     clean = '"%s"' % clean
             
+                if previous_level > value.level:
+                    undent = True
+                elif previous_level < value.level:
+                    indent = True
+                    
                 link = {
-                    "anchor": value.name, "count": value.count, "level": value.level,
+                    "anchor": value.name, 
+                    "count": value.count, 
+                    "level": value.level,
                     "href": base + facet.name + "=" + clean + ""
+                    'indent': indent,
+                    'undent': undent,
                 }
             
                 if val == clean:
