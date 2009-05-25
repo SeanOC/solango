@@ -108,7 +108,7 @@ def get_facets_links(request, results):
                     "anchor": value.name, 
                     "count": value.count, 
                     "level": value.level,
-                    "href": base + facet.name + "=" + clean + ""
+                    "href": base + facet.name + "=" + clean + "",
                     'indent': indent,
                     'undent': undent,
                 }
@@ -117,6 +117,7 @@ def get_facets_links(request, results):
                     link["active"] = True
             
                 links.append(link)
+                previous_level = value.level
     
     return links
 
